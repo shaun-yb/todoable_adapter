@@ -1,5 +1,11 @@
 class Adapter
-    def initialize
+    attr_accessor :base_url, :username
+    attr_writer :password
+
+    def initialize(username:, password:, base_url:)
+        @username = username
+        @password = password
+        @base_url = base_url
     end
 
     # GET /list
