@@ -8,6 +8,8 @@ class Adapter
     attr_accessor :base_uri, :username
     attr_writer :password
 
+    LIST_URI = "/lists"
+
     def initialize(username:, password:, base_uri:)
         @username = username
         @password = password
@@ -23,7 +25,7 @@ class Adapter
         
         response = self.class.post(base_uri + "/authenticate",
             basic_auth: basic_auth,
-            headers: headers
+            headers: authenticated_headers
         )
 
         @token = response["token"]
@@ -32,6 +34,12 @@ class Adapter
         
     # GET /list
     def get_lists
+        # todo: see if i can do a "before action" or something like that?
+        authenticate
+
+        response = self.class.get(base_uri + LIST_URI, headers: authenticated_headers)
+        binding.pry
+        response["lists"]
     end
 
     # POST /lists
@@ -62,12 +70,20 @@ class Adapter
     def delete_list_item
     end
 
-#    private
+   private
+   def authenticated_headers
+    auth_str = "Token token=\"#{@token}\""
+
+    headers = { 
+        "Accept": "application/json", 
+        "Content-Type": "application/json",
+        "Authorization": auth_str
+    }
+   end
 end
 
 
 ## COMMANDS
-a = Adapter.new(username: "shauncarland@gmail.com", password: "todoable", base_uri: "https://todoable.teachable.tech/api")
+# a = Adapter.new(username: "shauncarland@gmail.com", password: "todoable", base_uri: "https://todoable.teachable.tech/api")
 
-a.authenticate
-a.authenticate
+# puts a.get_lists.empty?
