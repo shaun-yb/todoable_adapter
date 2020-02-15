@@ -75,7 +75,15 @@ class Adapter
     end
 
     # POST /lists/:list_id/items
-    def post_list_item(list_item_id,list_id)
+    def post_list_item(list_id, list_params)
+        authenticate
+        body = list_params.to_json
+        url = base_uri + LIST_URI + "/#{list_id}" +"/items"
+        
+        p = { name: "foo" }
+        p2 = { item:  { name: "foo" }  } 
+        # todo: put in test to ensure name is neccesary
+        self.class.post(url, headers: authenticated_headers, body: body)
     end
 
     # PUT /lists/:list_id/items/:item_id/finish
@@ -102,6 +110,9 @@ end
 a = Adapter.new(username: "shauncarland@gmail.com", password: "todoable", base_uri: "https://todoable.teachable.tech/api")
 
 # a.get_list("1aed547a-5efa-41d6-8dea-1f697ae9a7e9")
+# a.patch_list("1aed547a-5efa-41d6-8dea-1f697ae9a7e9", { "list": { "name": "hello goodbye" } }) 
+
+a.post_list_item("f760cc58-23fa-42f5-b9b8-a1ca0d9edd74",{ item:  { name: "foobar" }  } )
 binding.pry
-a.patch_list("1aed547a-5efa-41d6-8dea-1f697ae9a7e9", { "list": { name: "hello goodbye" } }) 
+
 # a.post_list("lol fuck dis")
