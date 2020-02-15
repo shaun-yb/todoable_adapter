@@ -1,13 +1,35 @@
+# todo: add a gemfile
+require "pry"
+require "httparty"
+
 class Adapter
-    attr_accessor :base_url, :username
+    include HTTParty
+
+    attr_accessor :base_uri, :username
     attr_writer :password
 
-    def initialize(username:, password:, base_url:)
+    def initialize(username:, password:, base_uri:)
         @username = username
         @password = password
-        @base_url = base_url
+        @base_uri = base_uri
     end
 
+    # POST /api/authenticate
+    def authenticate
+        return if !@expires_at.nil? && @expires_at >= DateTime.now 
+
+        basic_auth = { "username": username, "password": @password }
+        headers = { "Accept": "application/json", "Content-Type": "application/json" }
+        
+        response = self.class.post(base_uri + "/authenticate",
+            basic_auth: basic_auth,
+            headers: headers
+        )
+
+        @token = response["token"]
+        @expires_at = DateTime.parse(response["expires_at"])
+    end
+        
     # GET /list
     def get_lists
     end
@@ -40,9 +62,12 @@ class Adapter
     def delete_list_item
     end
 
-    # POST /api/authenticate
-    def authenticate
-    end
-
-   private
+#    private
 end
+
+
+## COMMANDS
+a = Adapter.new(username: "shauncarland@gmail.com", password: "todoable", base_uri: "https://todoable.teachable.tech/api")
+
+a.authenticate
+a.authenticate
