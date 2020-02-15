@@ -87,7 +87,13 @@ class Adapter
     end
 
     # PUT /lists/:list_id/items/:item_id/finish
-    def put_list_item_finished(list_item_id,list_id)
+    def mark_list_item_finished(list_id, list_item_id)
+        authenticate
+        body = { item: { finished_at: DateTime.now } }.to_json
+
+        url = base_uri + LIST_URI  + "/#{list_id}/items/#{list_item_id}/finish"
+        self.class.put(url, headers: authenticated_headers, body: body)
+        get_list(list_id)
     end
 
     # /lists/:list_id/items/
@@ -112,7 +118,8 @@ a = Adapter.new(username: "shauncarland@gmail.com", password: "todoable", base_u
 # a.get_list("1aed547a-5efa-41d6-8dea-1f697ae9a7e9")
 # a.patch_list("1aed547a-5efa-41d6-8dea-1f697ae9a7e9", { "list": { "name": "hello goodbye" } }) 
 
-a.post_list_item("f760cc58-23fa-42f5-b9b8-a1ca0d9edd74",{ item:  { name: "foobar" }  } )
-binding.pry
+# a.post_list_item("f760cc58-23fa-42f5-b9b8-a1ca0d9edd74",{ item:  { name: "foobar" }  } )
+a.mark_list_item_finished("f760cc58-23fa-42f5-b9b8-a1ca0d9edd74", "60c67710-eaa4-40e2-97b6-ea1aa4d11649")
+# binding.pry
 
 # a.post_list("lol fuck dis")
