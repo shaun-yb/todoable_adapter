@@ -18,7 +18,7 @@ class Adapter
 
     # POST /api/authenticate
     def authenticate
-        return if !@expires_at.nil? && @expires_at >= DateTime.now 
+        return true if !@expires_at.nil? && @expires_at >= DateTime.now 
 
         basic_auth = { "username": username, "password": @password }
         headers = { "Accept": "application/json", "Content-Type": "application/json" }
@@ -30,6 +30,7 @@ class Adapter
 
         @token = response["token"]
         @expires_at = DateTime.parse(response["expires_at"])
+        true
     end
         
     # GET /list
@@ -38,12 +39,17 @@ class Adapter
         authenticate
 
         response = self.class.get(base_uri + LIST_URI, headers: authenticated_headers)
-        binding.pry
         response["lists"]
     end
 
     # POST /lists
-    def post_lists
+    def post_list(name)
+        authenticate
+        body = { "list": { "name": name } }.to_json
+        response = self.class.post(base_uri + LIST_URI, headers: authenticated_headers, body: body)
+
+        # todo: add in error handling when the name already taken
+        binding.pry
     end
 
     # GET /lists/:list_id
@@ -82,8 +88,7 @@ class Adapter
    end
 end
 
-
 ## COMMANDS
-# a = Adapter.new(username: "shauncarland@gmail.com", password: "todoable", base_uri: "https://todoable.teachable.tech/api")
+a = Adapter.new(username: "shauncarland@gmail.com", password: "todoable", base_uri: "https://todoable.teachable.tech/api")
 
-# puts a.get_lists.empty?
+a.post_list("lol wssxxxxsho dis")
