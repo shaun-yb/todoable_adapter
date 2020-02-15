@@ -59,21 +59,19 @@ class Adapter
         # todo: add in error handling when the name already taken and check what should be returned...
     end
     
-    
-
     # PATCH /lists/:list_id
     def patch_list(list_id, body_params)
         authenticate
         body = body_params.to_json
-        query = { list_id: list_id  }.to_json
-
         url = base_uri + LIST_URI + "/#{list_id}"
-        binding.pry
-        response = self.class.patch(url, headers: authenticated_headers, body: body_params)
+        response = self.class.patch(url, headers: authenticated_headers, body: body)
     end
 
     # DELETE /lists/:list_id
     def delete_list(list_id)
+        authenticate
+        url = base_uri + LIST_URI + "/#{list_id}"
+        response = self.class.delete(url, headers: authenticated_headers)
     end
 
     # POST /lists/:list_id/items
@@ -104,5 +102,6 @@ end
 a = Adapter.new(username: "shauncarland@gmail.com", password: "todoable", base_uri: "https://todoable.teachable.tech/api")
 
 # a.get_list("1aed547a-5efa-41d6-8dea-1f697ae9a7e9")
+binding.pry
 a.patch_list("1aed547a-5efa-41d6-8dea-1f697ae9a7e9", { "list": { name: "hello goodbye" } }) 
 # a.post_list("lol fuck dis")
