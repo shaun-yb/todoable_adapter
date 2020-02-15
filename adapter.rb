@@ -42,22 +42,34 @@ class Adapter
         response["lists"]
     end
 
+    # GET /lists/:list_id
+    def get_list(list_id)
+        authenticate
+        response = self.class.get(base_uri + LIST_URI + "/#{list_id}", headers: authenticated_headers)
+
+        # todo: add in error handling for when the list is not found
+        response
+    end
+
     # POST /lists
     def post_list(name)
         authenticate
         body = { "list": { "name": name } }.to_json
         response = self.class.post(base_uri + LIST_URI, headers: authenticated_headers, body: body)
-
-        # todo: add in error handling when the name already taken
-        binding.pry
+        # todo: add in error handling when the name already taken and check what should be returned...
     end
-
-    # GET /lists/:list_id
-    def get_list_by_id(list_id)
-    end
+    
+    
 
     # PATCH /lists/:list_id
-    def patch_list(list_id)
+    def patch_list(list_id, body_params)
+        authenticate
+        body = body_params.to_json
+        query = { list_id: list_id  }.to_json
+
+        url = base_uri + LIST_URI + "/#{list_id}"
+        binding.pry
+        response = self.class.patch(url, headers: authenticated_headers, body: body_params)
     end
 
     # DELETE /lists/:list_id
@@ -91,4 +103,6 @@ end
 ## COMMANDS
 a = Adapter.new(username: "shauncarland@gmail.com", password: "todoable", base_uri: "https://todoable.teachable.tech/api")
 
-a.post_list("lol wssxxxxsho dis")
+# a.get_list("1aed547a-5efa-41d6-8dea-1f697ae9a7e9")
+a.patch_list("1aed547a-5efa-41d6-8dea-1f697ae9a7e9", { "list": { name: "hello goodbye" } }) 
+# a.post_list("lol fuck dis")
