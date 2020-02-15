@@ -93,11 +93,14 @@ class Adapter
 
         url = base_uri + LIST_URI  + "/#{list_id}/items/#{list_item_id}/finish"
         self.class.put(url, headers: authenticated_headers, body: body)
-        get_list(list_id)
     end
 
     # /lists/:list_id/items/
-    def delete_list_item
+    def delete_list_item(list_id, list_item_id)
+        authenticate
+        url = base_uri + LIST_URI  + "/#{list_id}/items/#{list_item_id}"
+
+        self.class.delete(url, headers: authenticated_headers)
     end
 
    private
@@ -114,12 +117,4 @@ end
 
 ## COMMANDS
 a = Adapter.new(username: "shauncarland@gmail.com", password: "todoable", base_uri: "https://todoable.teachable.tech/api")
-
-# a.get_list("1aed547a-5efa-41d6-8dea-1f697ae9a7e9")
-# a.patch_list("1aed547a-5efa-41d6-8dea-1f697ae9a7e9", { "list": { "name": "hello goodbye" } }) 
-
-# a.post_list_item("f760cc58-23fa-42f5-b9b8-a1ca0d9edd74",{ item:  { name: "foobar" }  } )
-a.mark_list_item_finished("f760cc58-23fa-42f5-b9b8-a1ca0d9edd74", "60c67710-eaa4-40e2-97b6-ea1aa4d11649")
-# binding.pry
-
-# a.post_list("lol fuck dis")
+a.delete_list_item("f760cc58-23fa-42f5-b9b8-a1ca0d9edd74", "60c67710-eaa4-40e2-97b6-ea1aa4d11649")
