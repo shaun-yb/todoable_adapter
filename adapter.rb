@@ -1,11 +1,8 @@
-# todo: add a gemfile
-require "pry"
 require "httparty"
 
 class AdapterError < StandardError
 end
 
-# todo: see if i can get a config.ru file replacing this
 class Adapter
     include HTTParty
 
