@@ -23,15 +23,7 @@ RSpec.configure do |config|
     Dir[File.join(__dir__, "../*.rb")].each do |file|
       require_relative file
     end
-
-    # RSpec.configure do |config|
-    #   config.around(:example) do |example|
-    #     Timecop::Rspec.time_machine.run(example)
-    #   end
-    # end
     
-
-
     # This option will default to `true` in RSpec 4. It makes the `description`
     # and `failure_message` of custom matchers include text for helper methods
     # defined using `chain`, e.g.:
