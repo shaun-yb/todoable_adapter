@@ -43,7 +43,6 @@ class Adapter
         
     # GET /list
     def get_lists
-        # todo: see if i can do a "before action" or something like that?
         authenticate
 
         response = self.class.get(base_uri + LIST_URI, headers: authenticated_headers)
@@ -53,18 +52,14 @@ class Adapter
     # GET /lists/:list_id
     def get_list(list_id)
         authenticate
-        response = self.class.get(base_uri + LIST_URI + "/#{list_id}", headers: authenticated_headers)
-
-        # todo: add in error handling for when the list is not found
-        response
+        self.class.get(base_uri + LIST_URI + "/#{list_id}", headers: authenticated_headers)
     end
 
     # POST /lists
     def post_list(name)
         authenticate
         body = { "list": { "name": name } }.to_json
-        response = self.class.post(base_uri + LIST_URI, headers: authenticated_headers, body: body)
-        # todo: add in error handling when the name already taken and check what should be returned...
+        self.class.post(base_uri + LIST_URI, headers: authenticated_headers, body: body)
     end
     
     # PATCH /lists/:list_id
@@ -72,14 +67,16 @@ class Adapter
         authenticate
         body = body_params.to_json
         url = base_uri + LIST_URI + "/#{list_id}"
-        response = self.class.patch(url, headers: authenticated_headers, body: body)
+        
+        self.class.patch(url, headers: authenticated_headers, body: body)
     end
 
     # DELETE /lists/:list_id
     def delete_list(list_id)
         authenticate
         url = base_uri + LIST_URI + "/#{list_id}"
-        response = self.class.delete(url, headers: authenticated_headers)
+        
+        self.class.delete(url, headers: authenticated_headers)
     end
 
     # POST /lists/:list_id/items
@@ -88,7 +85,6 @@ class Adapter
         body = list_params.to_json
         url = base_uri + LIST_URI + "/#{list_id}" +"/items"
 
-        # todo: put in test to ensure name is neccesary
         self.class.post(url, headers: authenticated_headers, body: body)
     end
 
@@ -96,8 +92,8 @@ class Adapter
     def mark_list_item_finished(list_id, list_item_id)
         authenticate
         body = { item: { finished_at: DateTime.now } }.to_json
-
         url = base_uri + LIST_URI  + "/#{list_id}/items/#{list_item_id}/finish"
+       
         self.class.put(url, headers: authenticated_headers, body: body)
     end
 
