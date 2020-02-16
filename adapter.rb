@@ -2,6 +2,10 @@
 require "pry"
 require "httparty"
 
+class AdapterError < StandardError
+end
+
+# todo: see if i can get a config.ru file replacing this
 class Adapter
     include HTTParty
 
@@ -23,14 +27,18 @@ class Adapter
         basic_auth = { "username": username, "password": @password }
         headers = { "Accept": "application/json", "Content-Type": "application/json" }
         
-        response = self.class.post(base_uri + "/authenticate",
+        begin
+            response = self.class.post(base_uri + "/authenticate",
             basic_auth: basic_auth,
             headers: authenticated_headers
         )
 
-        @token = response["token"]
-        @expires_at = DateTime.parse(response["expires_at"])
-        true
+            @token = response["token"]
+            @expires_at = DateTime.parse(response["expires_at"])
+            return true
+        rescue
+            raise_adapter_error(__method__)
+        end
     end
         
     # GET /list
@@ -79,9 +87,7 @@ class Adapter
         authenticate
         body = list_params.to_json
         url = base_uri + LIST_URI + "/#{list_id}" +"/items"
-        
-        p = { name: "foo" }
-        p2 = { item:  { name: "foo" }  } 
+
         # todo: put in test to ensure name is neccesary
         self.class.post(url, headers: authenticated_headers, body: body)
     end
@@ -104,6 +110,11 @@ class Adapter
     end
 
    private
+
+   def raise_adapter_error(method)
+        raise AdapterError.new("Error with Adapter.  The called method was \##{method.to_s}")
+   end
+
    def authenticated_headers
     auth_str = "Token token=\"#{@token}\""
 
@@ -114,7 +125,3 @@ class Adapter
     }
    end
 end
-
-## COMMANDS
-a = Adapter.new(username: "shauncarland@gmail.com", password: "todoable", base_uri: "https://todoable.teachable.tech/api")
-a.delete_list_item("f760cc58-23fa-42f5-b9b8-a1ca0d9edd74", "60c67710-eaa4-40e2-97b6-ea1aa4d11649")

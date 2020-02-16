@@ -16,28 +16,24 @@ describe Adapter do
         context "when the call to the Todoable API fails" do
             it "raises an error (todo: check which one)" do
                 HTTParty.stub(:post).and_raise("Cannot connect")
-                expect { adapter.authenticate }.to raise_error
+                expect { adapter.authenticate }.to raise_error(AdapterError)
             end
         end
 
         context "when a second call is made before the response expires" do
-            # let(:expiration_date) { DateTime.parse(2019,1,1) }
             let(:current_datetime) { DateTime.new(2019,1,1) }
-
-            let(:response) { OpenStruct.new(body: response_body) }
-            let(:response_body) { { expires_at: (DateTime.new(2019,1,1,0,0,1)).to_s }.to_json }
+            let(:mocked_response) {{ "token" => "foo", "expires_at" => current_datetime.to_s }}
+            
             before do
-                allow(HTTParty).to receive(:post).and_return(response)
-                # todo: make this less hacky
-                allow(Time).to receive(:now).and_return(current_datetime)
+                allow(described_class).to receive(:post).and_return(mocked_response)
+                allow(DateTime).to receive(:now).and_return(current_datetime)
             end
             
             it "does not re-authenticate" do
-                # binding.pry
-                adapter.authenticate
-                adapter.authenticate
+                described_class.should_receive(:post).once
 
-                HTTParty.should_receive(:account_opened).once
+                adapter.authenticate
+                adapter.authenticate
             end
         end
     end
